@@ -1,5 +1,14 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { Pizza } from "lucide-react";
 import hero from "@/assets/hero-pizza.jpg";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -15,7 +24,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-type Item = { name: string; price: string; desc?: string };
+type Item = { name: string; price: string; desc: string };
 const menu: { title: string; note?: string; items: Item[] }[] = [
   { title: "Every Day Specials", note: "Unlimited toppings on every pizza", items: [
     { name: '10" Small Pizza', price: "13.99", desc: "Your perfect personal pie, loaded however you like." },
@@ -43,16 +52,18 @@ const menu: { title: string; note?: string; items: Item[] }[] = [
   ]},
   { title: "Side Orders", items: [
     { name: "Cheesy Bread", price: "12.99", desc: "Cheesy bread on a creamy garlic base." },
-    { name: "Fries (Large)", price: "6.99" },
+    { name: "Fries (Large)", price: "6.99", desc: "Crispy golden fries, cooked fresh and salted to order." },
     { name: "Garlic Dipping Sauce", price: "1.50", desc: "Creamy garlic dip." },
-    { name: "Cheddar Dipping Sauce", price: "1.50" },
+    { name: "Cheddar Dipping Sauce", price: "1.50", desc: "Warm, melty cheddar dip for fries or cheesy bread." },
   ]},
-  { title: "Beverages", items: [{ name: "Coke Can", price: "1.50" }] },
+  { title: "Beverages", items: [{ name: "Coke Can", price: "1.50", desc: "Ice-cold 355 ml can of Coke." }] },
 ];
 
 const PHONE = "tel:4167429000";
 
 function Index() {
+  const [selected, setSelected] = useState<{ item: Item; cat: string } | null>(null);
+
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur">
@@ -90,7 +101,10 @@ function Index() {
 
       <section id="menu" className="mx-auto max-w-6xl px-5 py-20">
         <h2 className="text-5xl md:text-6xl">The <span className="text-secondary">Menu</span></h2>
-        <p className="mt-2 text-muted-foreground">$10–20 per person · Every pizza comes with unlimited toppings</p>
+        <p className="mt-2 text-muted-foreground">
+          $10–20 per person · Every pizza comes with unlimited toppings
+        </p>
+        <p className="mt-1 text-sm font-semibold text-secondary">Tap any item to see the details →</p>
         <div className="mt-12 grid gap-8 md:grid-cols-2">
           {menu.map((cat) => (
             <div key={cat.title} className="rounded-xl border bg-card p-6">
@@ -99,11 +113,24 @@ function Index() {
               <ul className="mt-4 space-y-4">
                 {cat.items.map((it) => (
                   <li key={it.name}>
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-semibold">{it.name}</span>
-                      <span className="flex-1 border-b border-dashed border-border" />
+                    <button
+                      type="button"
+                      aria-haspopup="dialog"
+                      onClick={() => setSelected({ item: it, cat: cat.title })}
+                      className="group flex w-full cursor-pointer items-baseline gap-2 rounded text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      <span className="font-semibold transition-colors group-hover:text-primary group-focus-visible:text-primary">
+                        {it.name}
+                      </span>
+                      <span className="flex-1 border-b border-dashed border-border transition-colors group-hover:border-primary/60" />
                       <span className="font-bold text-secondary">${it.price}</span>
-                    </div>
+                      <span
+                        aria-hidden="true"
+                        className="translate-y-[-2px] text-lg leading-none text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
+                      >
+                        +
+                      </span>
+                    </button>
                     {it.desc && <p className="mt-1 text-sm text-muted-foreground">{it.desc}</p>}
                   </li>
                 ))}
@@ -112,6 +139,45 @@ function Index() {
           ))}
         </div>
       </section>
+
+      <Dialog open={selected !== null} onOpenChange={(open) => !open && setSelected(null)}>
+        <DialogContent className="max-w-md overflow-hidden border-border bg-card p-0 sm:rounded-2xl">
+          {selected && (
+            <>
+              <div className="flex items-start gap-4 border-b border-border px-6 pt-7 pb-5">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+                  <Pizza className="h-7 w-7" aria-hidden="true" />
+                </div>
+                <DialogHeader className="min-w-0 text-left">
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-secondary">
+                    {selected.cat}
+                  </p>
+                  <DialogTitle className="font-display text-4xl leading-none tracking-wide">
+                    {selected.item.name}
+                  </DialogTitle>
+                  <DialogDescription className="pt-2 text-base text-muted-foreground">
+                    {selected.item.desc}
+                  </DialogDescription>
+                </DialogHeader>
+              </div>
+              <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-5">
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground">Price</p>
+                  <p className="font-display text-4xl leading-none text-secondary">
+                    ${selected.item.price}
+                  </p>
+                </div>
+                <a
+                  href={PHONE}
+                  className="rounded-md bg-primary px-5 py-3 font-bold text-primary-foreground hover:opacity-90"
+                >
+                  Call to order
+                </a>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <section id="visit" className="border-t bg-card">
         <div className="mx-auto grid max-w-6xl gap-10 px-5 py-20 md:grid-cols-3">
