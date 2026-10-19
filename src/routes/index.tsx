@@ -61,7 +61,7 @@ const menu: { title: string; note?: string; items: Item[] }[] = [
 
 const PHONE = "tel:4167429000";
 
-function Index() {
+export function Index() {
   const [selected, setSelected] = useState<{ item: Item; cat: string } | null>(null);
 
   return (
