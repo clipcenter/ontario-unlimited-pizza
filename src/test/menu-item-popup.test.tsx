@@ -7,7 +7,7 @@ import { Storefront } from "@/components/storefront";
 // description and its price — the page's only path to those details.
 describe("Menu item popup", () => {
   it("shows the name, description and price of the clicked item", () => {
-    render(<Index />);
+    render(<Storefront />);
 
     fireEvent.click(screen.getByRole("button", { name: /14" Large Pizza/ }));
 
@@ -21,7 +21,7 @@ describe("Menu item popup", () => {
   });
 
   it("shows the clicked item's own details, not another item's", () => {
-    render(<Index />);
+    render(<Storefront />);
 
     fireEvent.click(screen.getByRole("button", { name: /Cheesy Bread/ }));
 
@@ -33,7 +33,7 @@ describe("Menu item popup", () => {
   });
 
   it("closes the popup", async () => {
-    render(<Index />);
+    render(<Storefront />);
 
     fireEvent.click(screen.getByRole("button", { name: /Chicken Wings/ }));
     const dialog = screen.getByRole("dialog");
