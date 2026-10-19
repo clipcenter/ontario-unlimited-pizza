@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { Index } from "@/routes/index";
+import { Storefront } from "@/components/storefront";
 
 // Clicking a menu item must open a popup that repeats the item's name, its
 // description and its price — the page's only path to those details.
